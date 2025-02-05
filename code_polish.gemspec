@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://github.com/rahulkush1/code_polish"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
-  metadata["rubygems_mfa_required"] = "true"
+  spec.metadata["rubygems_mfa_required"] = "true"
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
