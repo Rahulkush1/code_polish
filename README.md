@@ -44,10 +44,14 @@ require 'code_polish'
 CodePolish::Refactor.analyze_code("example.rb")
 ```
 
+[Read more about CodePolish on RubyDoc](https://rubydoc.info/gems/code_polish)
+
+
 ---
 
 ## 🔖 Versioning
 
+![Gem Version](https://badge.fury.io/rb/code_polish.svg)
 This gem follows **Semantic Versioning (SemVer)**:
 - **Major (`1.0.0`)** → Breaking changes
 - **Minor (`0.2.0`)** → New features
@@ -68,6 +72,8 @@ This gem follows **Semantic Versioning (SemVer)**:
 ## 📝 License
 
 This project is licensed under the **MIT License**. See the `LICENSE` file for details.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
 
 ---
 
