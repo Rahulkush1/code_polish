@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+require_relative "../lib/code_polish"
+
+input = ARGV[0]
+
+if input.nil?
+  puts "Usage: code_polish <file_path> OR 'ruby_code'"
+  exit(1)
+end
+
+if File.exist?(input)
+  # If input is a file, analyze its content
+  CodePolish::Refactor.analyze_code(input)
+else
+  # If input is direct Ruby code, analyze it
+  puts "Analyzing inline Ruby code..."
+  suggestions = CodePolish::Refactor.send(:suggest_refactoring, input)
+  puts suggestions
+end
