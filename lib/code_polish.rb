@@ -92,23 +92,6 @@ module CodePolish
 
       suggestions.empty? ? "No improvements found." : suggestions.join("\n")
     end
-
-    def self.call_openai(code)
-      require 'openai'
-      client = OpenAI::Client.new(api_key: ENV['OPENAI_API_KEY'])
-
-      response = client.chat(
-        parameters: {
-          model: "gpt-4",
-          messages: [{ role: "user", content: "Suggest refactoring for this Ruby code:\n#{code}" }],
-          temperature: 0.7
-        }
-      )
-
-      response.dig("choices", 0, "message", "content")
-    rescue => e
-      "AI analysis failed: #{e.message}"
-    end
   end
 end
 
