@@ -9,10 +9,11 @@ Gem::Specification.new do |spec|
   spec.email = ["rahulkush2023@gmail.com"]
 
   spec.summary = "A lightweight analysis tool for Ruby."
-  spec.description = "CodePolish helps developers analyze and refactor Ruby code by detecting common code smells, formatting issues, and performance inefficiencies."
+  spec.description = "CodePolish helps developers analyze and refactor Ruby code by detecting, formatting issues."
   spec.homepage = "https://github.com/rahulkush1/code_polish"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
+  metadata["rubygems_mfa_required"] = "true"
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
