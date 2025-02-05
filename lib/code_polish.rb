@@ -3,95 +3,41 @@
 require_relative "code_polish/version"
 
 module CodePolish
+  # This class provides methods to analyze and suggest refactoring improvements
+  # for Ruby code based on best practices.
   class Refactor
+    REFACTOR_RULES = {
+      /\.each\s*do\s*\|.*\|\s*.*\.push/ => "Use `map` instead of `each` + `push`",
+      /if .*\.nil\?/ => "Use `&.` (safe navigation operator) for nil checks",
+      /\.length\s*==\s*0/ => "Use `.empty?` instead of `.length == 0`",
+      /!\s*.*\.blank\?/ => "Use `.present?` instead of `!blank?`",
+      /\.select\{.*\}\.count\s*==\s*1/ => "Use `.one?` instead of `.select.count == 1`",
+      /\.each\s*\{\s*\|/ => "Use `.find_each` instead of `.each` for large ActiveRecord queries",
+      /Time\.now/ => "Use `Time.current` instead of `Time.now` for Rails apps",
+      /eval\s*\(/ => "Avoid `eval`, use `send` or `public_send` instead",
+      /puts/ => "Use `Rails.logger` instead of `puts` in production code",
+      /\.downcase\s*==/ => "Use `.casecmp?` instead of `.downcase ==`",
+      /\.select\{.*\}\.first/ => "Use `.detect` instead of `.select.first`",
+      /for\s+\w+\s+in\s+/ => "Avoid `for` loops, use `.each` instead",
+      /\[\s*:.*\]\s*\[\s*:.*\]/ => "Use `.dig` instead of nested hash access",
+      /\.map\(&:\w+\)/ => "Use `.pluck(:attr)` instead of `.map(&:attr)` for ActiveRecord queries",
+      /\.each_with_index\s*\{.*\|\w+,\s*\|/ => "Use `.each` instead of `.each_with_index` if index is not used",
+      /\.nil\?\s*&&\s*.*\.exist\?/ => "Use `!record.exist?` instead of `record.nil?` in ActiveRecord",
+      /if\s+!\s+/ => "Use `unless` instead of `if !condition`",
+      /\.select\s*\{\s*\|.*\|\s*!.*\.nil\?\s*\}/ => "Use `.compact` instead of `.select { |x| !x.nil? }`",
+      /\[.*\]\.flatten/ => "Use `Array.wrap(value)` instead of `[value].flatten`",
+      /self\./ => "Use `.tap` instead of explicit `self` in method chaining"
+    }.freeze
+
     def self.analyze_code(file_or_code)
-      if File.exist?(file_or_code)
-        code = File.read(file_or_code)
-      else
-        code = file_or_code  # Handle direct Ruby code
-      end
+      code = File.exist?(file_or_code) ? File.read(file_or_code) : file_or_code
       suggestions = suggest_refactoring(code)
       puts "Refactoring Suggestions:\n#{suggestions}"
     end
 
-    private
-
     def self.suggest_refactoring(code)
-      suggestions = []
-
-      # 1️⃣ Use `map` instead of `each` + `push`
-      suggestions << "Use `map` instead of `each` + `push`" if code.match?(/\.each\s*do\s*\|.*\|\s*.*\.push/)
-
-      # 2️⃣ Use safe navigation operator `&.` for nil checks
-      suggestions << "Use `&.` (safe navigation operator) for nil checks" if code.match?(/if .*\.nil\?/)
-
-      # 3️⃣ Use `empty?` instead of `length == 0`
-      suggestions << "Use `.empty?` instead of `.length == 0`" if code.match?(/\.length\s*==\s*0/)
-
-      # 4️⃣ Use `present?` instead of `!blank?`
-      suggestions << "Use `.present?` instead of `!blank?`" if code.match?(/!\s*.*\.blank\?/)
-
-      # 5️⃣ Use `one?` instead of `select.count == 1`
-      suggestions << "Use `.one?` instead of `.select.count == 1`" if code.match?(/\.select\{.*\}\.count\s*==\s*1/)
-
-      # 6️⃣ Prefer `find_each` over `each` for large data sets
-      suggestions << "Use `.find_each` instead of `.each` for large ActiveRecord queries" if code.match?(/\.each\s*\{\s*\|/)
-
-      # 7️⃣ Avoid `Time.now`, prefer `Time.current` (Rails best practice)
-      suggestions << "Use `Time.current` instead of `Time.now` for Rails apps" if code.match?(/Time\.now/)
-
-      # 8️⃣ Avoid using `eval`, use `send` or `public_send`
-      suggestions << "Avoid `eval`, use `send` or `public_send` instead" if code.match?(/eval\s*\(/)
-
-      # 9️⃣ Avoid `puts` in production code, use `Rails.logger`
-      suggestions << "Use `Rails.logger` instead of `puts` in production code" if code.match?(/puts/)
-
-      # 🔟 Use `String#casecmp?` instead of `.downcase ==`
-      suggestions << "Use `.casecmp?` instead of `.downcase ==` for case-insensitive string comparison" if code.match?(/\.downcase\s*==/)
-
-      # 1️⃣1️⃣ Avoid `select.first`, use `detect` instead
-      suggestions << "Use `.detect` instead of `.select.first`" if code.match?(/\.select\{.*\}\.first/)
-
-      # 1️⃣2️⃣ Avoid using `for` loops, prefer `.each`
-      suggestions << "Avoid `for` loops, use `.each` instead" if code.match?(/for\s+\w+\s+in\s+/)
-
-      # 1️⃣3️⃣ Use `dig` instead of nested hash access
-      suggestions << "Use `.dig` instead of nested hash access" if code.match?(/\[\s*:.*\]\s*\[\s*:.*\]/)
-
-      # 1️⃣4️⃣ Prefer `pluck` over `map(&:attr)` for ActiveRecord
-      suggestions << "Use `.pluck(:attr)` instead of `.map(&:attr)` for ActiveRecord queries" if code.match?(/\.map\(&:\w+\)/)
-
-      # 1️⃣5️⃣ Avoid `each_with_index` when index is not needed
-      suggestions << "Use `.each` instead of `.each_with_index` if index is not used" if code.match?(/\.each_with_index\s*\{.*\|\w+,\s*\|/)
-
-      # 1️⃣6️⃣ Use `!exist?` instead of `nil?` for ActiveRecord
-      suggestions << "Use `!record.exist?` instead of `record.nil?` in ActiveRecord" if code.match?(/\.nil\?\s*&&\s*.*\.exist\?/)
-
-      # 1️⃣7️⃣ Prefer `unless` instead of `if !condition`
-      suggestions << "Use `unless` instead of `if !condition`" if code.match?(/if\s+!\s+/)
-
-      # 1️⃣8️⃣ Use `compact` to remove nil values instead of `select`
-      suggestions << "Use `.compact` instead of `.select { |x| !x.nil? }`" if code.match?(/\.select\s*\{\s*\|.*\|\s*!.*\.nil\?\s*\}/)
-
-      # 1️⃣9️⃣ Use `Array.wrap(value)` instead of `[value].flatten`
-      suggestions << "Use `Array.wrap(value)` instead of `[value].flatten`" if code.match?(/\[.*\]\.flatten/)
-
-      # 2️⃣0️⃣ Prefer `tap` for method chaining instead of `self`
-      suggestions << "Use `.tap` instead of explicit `self` in method chaining" if code.match?(/self\./)
-
-      # 🆕 **Future Enhancements**
-      # ✅ Add more Rails-specific rules
-      # ✅ Add more object-oriented programming (OOP) best practices
-      # ✅ Add performance optimization suggestions
-
-      # AI-based analysis (Optional)
-      if ENV['OPENAI_API_KEY']
-        response = call_openai(code)
-        suggestions << response if response
-      end
-
+      suggestions = REFACTOR_RULES.map { |pattern, message| message if code.match?(pattern) }.compact
       suggestions.empty? ? "No improvements found." : suggestions.join("\n")
     end
   end
 end
-

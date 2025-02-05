@@ -1,4 +1,7 @@
-#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# !/usr/bin/env ruby
+
 require_relative "../lib/code_polish"
 
 input = ARGV[0]
